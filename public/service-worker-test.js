@@ -3,7 +3,6 @@ var FILES_TO_CACHE = [
   '/',
   '/styles.css',
   '/index.js',
-  '/db.js',
   '/manifest.json',
   '/favicon.ico',
   '/icons/icon-192x192.png',
@@ -47,7 +46,39 @@ self.addEventListener("activate", function(evt) {
 
 // makes fetch request
 self.addEventListener("fetch", function(evt) {
-  if (evt.request.url.includes("/api/")) {
+  
+
+  if(evt.request.url.includes("/api/transaction") && evt.request.method === "POST" ){
+    console.log("Yes");
+
+    /***********  My Sync Code Start ***********/
+    /*
+    self.onsync = function(evt) {
+      fetch(event.request).then(response => {
+        return cache.put(evt.request, response.clone()).then(() => {
+          return response;
+        });
+      })
+    } */
+    /***********  My Sync Code End ***********/
+
+    /***********  My add Request to IndexDB Code Start ***********/
+
+    evt.respondWith((evt) => {
+      if(true){
+        let response =  await fetch(evt.request);
+        await IDB.add(response, evt.request.body.id)
+        return response
+      }
+    })
+
+    /***********  My add Request to IndexDB Code End ***********/
+
+
+
+
+   }else if (evt.request.url.includes("/api/") && evt.request.method !== "POST" ) {
+
     evt.respondWith(
       caches.open(DATA_CACHE_NAME).then(cache => {
         return fetch(evt.request)

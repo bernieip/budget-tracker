@@ -1,28 +1,74 @@
 const express = require("express");
-const logger = require("morgan");
-const mongoose = require("mongoose");
 const compression = require("compression");
 
-const PORT = 3000;
+// Database Connection Request
+require('dotenv/config');
+const connectDB = require("./config/connectDB.js");
 
-const app = express();
+// Bring in models
+const db = require("./models");
 
-app.use(logger("dev"));
+// Create an instance of the express app.
+let app = express();
 
 app.use(compression());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-
 app.use(express.static("public"));
 
-mongoose.connect("mongodb://localhost/budget", {
-  useNewUrlParser: true,
-  useFindAndModify: false
+const PORT = process.env.PORT || 9090;
+
+
+/******************************* MiddleWare  ****************************/
+
+
+//GET REQUESTS
+
+app.get("/api/transaction", (req,res) => {
+  db.Transaction.find({})
+  .then(dbData => {
+    res.json(dbData);
+  })
+  .catch(err => {
+    res.json(err);
+  });
 });
 
-// routes
-app.use(require("./routes/api.js"));
+app.post("/api/transaction", (req,res) => {
+  let data = req.body;
+  //console.log(data);
 
-app.listen(PORT, () => {
-  console.log(`App running on port ${PORT}!`);
+  db.Transaction.create({
+    date: data.date,
+    name: data.name,
+    value: data.value
+    }).then(dbUpdate => {
+      res.json(dbUpdate);
+    })
+    .catch(err => {
+      res.json(err);
+  });
+});
+
+app.post("/api/transaction/bulk", (req,res) => {
+  let data = req.body;
+
+  db.Transaction.collection.insertMany(data)
+  .then(dbUpdate => {
+    res.json(dbUpdate);
+  })
+  .catch(err => {
+    res.json(err);
+  });
+
+});
+
+
+/******************************* Connect to db  ****************************/
+connectDB()
+
+// Start our server so that it can begin listening to client requests.
+app.listen(PORT, function() {
+  // Log (server-side) when our server has started
+  console.log("Server listening on: http://localhost:" + PORT);
 });
