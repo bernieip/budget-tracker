@@ -15,7 +15,7 @@ You can access this app at: https://stark-tundra-69764.herokuapp.com/
 
 Enter the name of the transaction and the amount and you can subtract/add it to your total.
 
-![Image description](/public/images/markdown-preview-image-png)
+!(/public/images/markdown-preview-image.png)
 
 
 
